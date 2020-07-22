@@ -2,8 +2,14 @@ import {useState, useEffect} from 'react';
 import {MainLayout} from "../../components/MainLayout";
 import Link from "next/link";
 import {useRouter} from "next/router";
+import {MyPost} from "../../interfaces/post";
+import {NextPageContext} from "next";
 
-export default function Post({ post: serverPost }) {
+interface PostPageProps {
+  post: MyPost
+}
+
+export default function Post({ post: serverPost }: PostPageProps) {
 
   const [post, setPost] = useState(serverPost)
 
@@ -11,7 +17,7 @@ export default function Post({ post: serverPost }) {
 
   useEffect(() => {
     async function load() {
-      const response = await fetch(`http://localhost:4200/posts/${router.query.id}`)
+      const response = await fetch(`${process.env.API_URL}/posts/${router.query.id}`)
       const data = await response.json()
       setPost(data)
     }
@@ -40,23 +46,28 @@ export default function Post({ post: serverPost }) {
   )
 }
 
-/*
-Post.getInitialProps = async ({ query, req }) => {
+interface PostNextPageContext extends NextPageContext {
+  query: {
+    id: string
+  }
+}
+
+Post.getInitialProps = async ({ query, req }: PostNextPageContext) => {
 
   if(!req) {
     return {post: null}
   }
 
   const response = await fetch(`http://localhost:4200/posts/${query.id}`);
-  const post = await response.json();
+  const post: MyPost = await response.json();
 
   return {
     post
   }
 
-}*/
+}
 
-export async function getServerSideProps({ query, req }) {
+/*export async function getServerSideProps({ query, req }) {
   if(!req) {
     return {post: null}
   }
@@ -65,4 +76,4 @@ export async function getServerSideProps({ query, req }) {
   const post = await response.json();
 
   return {props: {post}}
-}
+}*/
